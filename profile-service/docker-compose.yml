@@ -1,0 +1,49 @@
+version: '3.8'
+
+services:
+  postgres:
+    image: postgres:17.2-alpine
+    container_name: profile-service-db
+    environment:
+      POSTGRES_DB: ${POSTGRES_DB:-profile-service}
+      POSTGRES_USER: ${POSTGRES_USER:-profile-service}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:-profile-service}
+    ports:
+      - "5433:5432"
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U profile-service -d profile-service"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+    networks:
+      - profile-service-network
+
+  app:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    container_name: profile-service-app
+    depends_on:
+      postgres:
+        condition: service_healthy
+    environment:
+      SPRING_PROFILES_ACTIVE: dev
+      DB_HOST: ${DB_HOST:-postgres}
+      DB_PORT: ${DB_PORT:-5432}
+      DB_NAME: ${DB_NAME:-profile-service}
+      DB_USERNAME: ${DB_USERNAME:-profile-service}
+      DB_PASSWORD: ${DB_PASSWORD:-profile-service}
+    ports:
+      - "8080:8080"
+    networks:
+      - profile-service-network
+
+volumes:
+  postgres_data:
+
+networks:
+  profile-service-network:
+    driver: bridge
+
