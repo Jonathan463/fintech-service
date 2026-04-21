@@ -10,7 +10,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 
-@Table(name = "users")
+@Table(name = "business")
 @Getter
 @Setter
 @AllArgsConstructor

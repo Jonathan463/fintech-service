@@ -20,4 +20,9 @@ public class Partner {
     @JoinColumn(name = "business_id")
     private Business business;
 
+    private String name;
+    private float ratio;
+    private String destination_account;
+    private String destination_bank_name;
+
 }
