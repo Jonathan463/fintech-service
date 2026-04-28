@@ -9,7 +9,7 @@ services:
       POSTGRES_USER: ${POSTGRES_USER:-virtual-account-service}
       POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:-virtual-account-service}
     ports:
-      - "5433:5432"
+      - "5434:5432"
     volumes:
       - postgres_data:/var/lib/postgresql/data
     healthcheck:
@@ -36,7 +36,7 @@ services:
       DB_USERNAME: ${DB_USERNAME:-virtual-account-service}
       DB_PASSWORD: ${DB_PASSWORD:-virtual-account-service}
     ports:
-      - "8081:8081"
+      - "8081:8080"
     networks:
       - virtual-account-service-network
 

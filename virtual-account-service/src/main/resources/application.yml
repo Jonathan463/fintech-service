@@ -1,6 +1,6 @@
 spring:
   application:
-    name: AsynchronousCheckout
+    name: Virtual-Account-Service
   profiles:
     active: dev
 

@@ -1,6 +1,6 @@
 spring:
   application:
-    name: AsynchronousCheckout
+    name: ProfileService
   profiles:
     active: dev
 
