@@ -1,9 +1,9 @@
 spring:
   datasource:
-    url: jdbc:postgresql://${DB_HOST:localhost}:${DB_PORT:5433}/${DB_NAME:profile-service}
+    url: jdbc:postgresql://${DB_HOST:localhost}:${DB_PORT:5433}/${DB_NAME:virtual-account-service}
     driver-class-name: org.postgresql.Driver
-    username: ${DB_USERNAME:profile-service}
-    password: ${DB_PASSWORD:profile-service}
+    username: ${DB_USERNAME:virtual-account-service}
+    password: ${DB_PASSWORD:virtual-account-service}
     hikari:
       maximum-pool-size: 200
       minimum-idle: 5
