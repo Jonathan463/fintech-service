@@ -1,0 +1,17 @@
+package technologyforall.com.virtualaccountservice.dto;
+
+import lombok.AllArgsConstructor;
+import lombok.Getter;
+import lombok.NoArgsConstructor;
+import lombok.Setter;
+
+@Getter
+@Setter
+@AllArgsConstructor
+@NoArgsConstructor
+public class VirtualAccountResponse {
+
+    private Long id;
+    private Long businessId;
+    private String virtualAccount;
+}
