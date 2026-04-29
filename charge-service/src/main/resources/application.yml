@@ -1,0 +1,9 @@
+spring:
+  application:
+    name: Charge-Service
+  profiles:
+    active: dev
+
+server:
+  port: 8082
+
