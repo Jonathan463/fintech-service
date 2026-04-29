@@ -1,0 +1,49 @@
+version: '3.8'
+
+services:
+  postgres:
+    image: postgres:17.2-alpine
+    container_name: charge-service-db
+    environment:
+      POSTGRES_DB: ${POSTGRES_DB:-charge-service}
+      POSTGRES_USER: ${POSTGRES_USER:-charge-service}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:-charge-service}
+    ports:
+      - "5434:5432"
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U charge-service -d charge-service"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+    networks:
+      - charge-service-network
+
+  app:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    container_name: charge-service-app
+    depends_on:
+      postgres:
+        condition: service_healthy
+    environment:
+      SPRING_PROFILES_ACTIVE: dev
+      DB_HOST: ${DB_HOST:-postgres}
+      DB_PORT: ${DB_PORT:-5432}
+      DB_NAME: ${DB_NAME:-charge-service}
+      DB_USERNAME: ${DB_USERNAME:-charge-service}
+      DB_PASSWORD: ${DB_PASSWORD:-charge-service}
+    ports:
+      - "8081:8080"
+    networks:
+      - charge-service-network
+
+volumes:
+  postgres_data:
+
+networks:
+  charge-service-network:
+    driver: bridge
+
