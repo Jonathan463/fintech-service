@@ -36,7 +36,7 @@ services:
       DB_USERNAME: ${DB_USERNAME:-charge-service}
       DB_PASSWORD: ${DB_PASSWORD:-charge-service}
     ports:
-      - "8081:8080"
+      - "8082:8080"
     networks:
       - charge-service-network
 
