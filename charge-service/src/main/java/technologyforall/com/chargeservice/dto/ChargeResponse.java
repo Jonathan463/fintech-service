@@ -12,6 +12,12 @@ import java.math.BigDecimal;
 @AllArgsConstructor
 @NoArgsConstructor
 public class ChargeResponse {
+    private Long id;
+    private String sourceAcct;
+    private String destAcct;
+    private String sourceBankName;
     private BigDecimal transferAmount;
+    private String chargeRate;
     private BigDecimal charge;
+    private BigDecimal totalDebit;
 }
