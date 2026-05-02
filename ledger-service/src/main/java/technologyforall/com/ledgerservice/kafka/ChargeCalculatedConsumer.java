@@ -4,6 +4,7 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.kafka.annotation.KafkaListener;
 import org.springframework.stereotype.Component;
+import org.springframework.transaction.annotation.Transactional;
 import technologyforall.com.ledgerservice.event.ChargeCalculatedEvent;
 import technologyforall.com.ledgerservice.event.LedgerRecordedEvent;
 import technologyforall.com.ledgerservice.model.LedgerEntryType;
@@ -21,6 +22,7 @@ public class ChargeCalculatedConsumer {
     private final LedgerEntryRepository ledgerEntryRepository;
     private final LedgerRecordedProducer ledgerRecordedProducer;
 
+    @Transactional
     @KafkaListener(topics = "charge.calculated", groupId = "ledger-service-group",
             containerFactory = "kafkaListenerContainerFactory")
     public void handleChargeCalculated(ChargeCalculatedEvent event) {

@@ -1,9 +1,7 @@
 package technologyforall.com.chargeservice.model;
 
-import jakarta.persistence.Entity;
-import jakarta.persistence.GeneratedValue;
-import jakarta.persistence.GenerationType;
-import jakarta.persistence.Id;
+import jakarta.persistence.*;
+
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -16,10 +14,13 @@ import java.math.BigDecimal;
 @AllArgsConstructor
 @NoArgsConstructor
 @Entity
+@Table(name = "charge", uniqueConstraints = @UniqueConstraint(columnNames = "transfer_id"))
 public class Charge {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
+
+    @Column(name = "transfer_id", unique = true)
     private Long transferId;
     private BigDecimal transferAmount;
     private BigDecimal charge;

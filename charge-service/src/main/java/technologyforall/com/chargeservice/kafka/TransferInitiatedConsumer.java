@@ -4,6 +4,7 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.kafka.annotation.KafkaListener;
 import org.springframework.stereotype.Component;
+import org.springframework.transaction.annotation.Transactional;
 import technologyforall.com.chargeservice.event.ChargeCalculatedEvent;
 import technologyforall.com.chargeservice.event.TransferInitiatedEvent;
 import technologyforall.com.chargeservice.model.Charge;
@@ -20,6 +21,7 @@ public class TransferInitiatedConsumer {
     private final ChargeRepository chargeRepository;
     private final ChargeCalculatedProducer chargeCalculatedProducer;
 
+    @Transactional
     @KafkaListener(topics = "transfer.initiated", groupId = "charge-service-group",
             containerFactory = "kafkaListenerContainerFactory")
     public void handleTransferInitiated(TransferInitiatedEvent event) {
