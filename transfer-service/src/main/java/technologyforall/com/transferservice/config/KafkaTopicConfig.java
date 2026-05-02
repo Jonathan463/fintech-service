@@ -39,4 +39,25 @@ public class KafkaTopicConfig {
                 .replicas(3)
                 .build();
     }
+
+    // Dead Letter Topics — failed messages land here after 3 retries
+    @Bean
+    public NewTopic transferInitiatedDlt() {
+        return TopicBuilder.name("transfer.initiated.DLT").partitions(3).replicas(3).build();
+    }
+
+    @Bean
+    public NewTopic chargeCalculatedDlt() {
+        return TopicBuilder.name("charge.calculated.DLT").partitions(3).replicas(3).build();
+    }
+
+    @Bean
+    public NewTopic ledgerRecordedDlt() {
+        return TopicBuilder.name("ledger.recorded.DLT").partitions(3).replicas(3).build();
+    }
+
+    @Bean
+    public NewTopic transferCompletedDlt() {
+        return TopicBuilder.name("transfer.completed.DLT").partitions(3).replicas(3).build();
+    }
 }
