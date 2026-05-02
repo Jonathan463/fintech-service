@@ -1,0 +1,20 @@
+version: '3.8'
+
+# notification-service has no database — it is a pure Kafka consumer.
+services:
+  app:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    container_name: notification-service-app
+    environment:
+      SPRING_PROFILES_ACTIVE: dev
+      SPRING_KAFKA_BOOTSTRAP_SERVERS: ${KAFKA_BOOTSTRAP_SERVERS:-kafka-broker-1:9092,kafka-broker-2:9092,kafka-broker-3:9092}
+    ports:
+      - "8086:8086"
+    networks:
+      - notification-service-network
+
+networks:
+  notification-service-network:
+    driver: bridge

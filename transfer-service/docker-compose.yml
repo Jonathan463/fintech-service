@@ -3,28 +3,28 @@ version: '3.8'
 services:
   postgres:
     image: postgres:17.2-alpine
-    container_name: charge-service-db
+    container_name: transfer-service-db
     environment:
-      POSTGRES_DB: ${POSTGRES_DB:-charge-service}
-      POSTGRES_USER: ${POSTGRES_USER:-charge-service}
-      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:-charge-service}
+      POSTGRES_DB: ${POSTGRES_DB:-transfer-service}
+      POSTGRES_USER: ${POSTGRES_USER:-transfer-service}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:-transfer-service}
     ports:
-      - "5434:5432"
+      - "5435:5432"
     volumes:
       - postgres_data:/var/lib/postgresql/data
     healthcheck:
-      test: ["CMD-SHELL", "pg_isready -U charge-service -d charge-service"]
+      test: ["CMD-SHELL", "pg_isready -U transfer-service -d transfer-service"]
       interval: 10s
       timeout: 5s
       retries: 5
     networks:
-      - charge-service-network
+      - transfer-service-network
 
   app:
     build:
       context: .
       dockerfile: Dockerfile
-    container_name: charge-service-app
+    container_name: transfer-service-app
     depends_on:
       postgres:
         condition: service_healthy
@@ -32,19 +32,18 @@ services:
       SPRING_PROFILES_ACTIVE: dev
       DB_HOST: ${DB_HOST:-postgres}
       DB_PORT: ${DB_PORT:-5432}
-      DB_NAME: ${DB_NAME:-charge-service}
-      DB_USERNAME: ${DB_USERNAME:-charge-service}
-      DB_PASSWORD: ${DB_PASSWORD:-charge-service}
+      DB_NAME: ${DB_NAME:-transfer-service}
+      DB_USERNAME: ${DB_USERNAME:-transfer-service}
+      DB_PASSWORD: ${DB_PASSWORD:-transfer-service}
       SPRING_KAFKA_BOOTSTRAP_SERVERS: ${KAFKA_BOOTSTRAP_SERVERS:-kafka-broker-1:9092,kafka-broker-2:9092,kafka-broker-3:9092}
     ports:
-      - "8082:8080"
+      - "8083:8083"
     networks:
-      - charge-service-network
+      - transfer-service-network
 
 volumes:
   postgres_data:
 
 networks:
-  charge-service-network:
+  transfer-service-network:
     driver: bridge
-
