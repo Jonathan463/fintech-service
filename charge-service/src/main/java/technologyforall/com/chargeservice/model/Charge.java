@@ -20,6 +20,7 @@ public class Charge {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
+    private Long transferId;
     private BigDecimal transferAmount;
     private BigDecimal charge;
     private String sourceAcct;

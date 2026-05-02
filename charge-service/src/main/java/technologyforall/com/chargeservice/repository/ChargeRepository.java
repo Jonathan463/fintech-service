@@ -5,5 +5,6 @@ import org.springframework.stereotype.Repository;
 import technologyforall.com.chargeservice.model.Charge;
 
 @Repository
-public interface ChargeRepository extends JpaRepository<Charge,Long> {
+public interface ChargeRepository extends JpaRepository<Charge, Long> {
+    boolean existsByTransferId(Long transferId);
 }
