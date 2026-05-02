@@ -40,3 +40,7 @@ spring:
       auto-offset-reset: earliest
       properties:
         spring.json.trusted.packages: "*"
+
+services:
+  profile-service:
+    base-url: http://localhost:8081
