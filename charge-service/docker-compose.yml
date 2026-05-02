@@ -9,7 +9,7 @@ services:
       POSTGRES_USER: ${POSTGRES_USER:-charge-service}
       POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:-charge-service}
     ports:
-      - "5434:5432"
+      - "5437:5432"
     volumes:
       - postgres_data:/var/lib/postgresql/data
     healthcheck:

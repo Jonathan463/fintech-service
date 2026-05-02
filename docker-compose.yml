@@ -71,7 +71,7 @@ services:
       POSTGRES_USER: profile-service
       POSTGRES_PASSWORD: profile-service
     ports:
-      - "5432:5432"
+      - "5439:5432"
     volumes:
       - profile_data:/var/lib/postgresql/data
     healthcheck:
