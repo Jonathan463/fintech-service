@@ -1,0 +1,300 @@
+version: '3.8'
+
+# ============================================================
+#  Fintech Service — Full System docker-compose
+#  Starts: 3 Kafka brokers (KRaft) + 5 PostgreSQL databases
+#          + 6 Spring Boot microservices on one shared network.
+#
+#  Usage:  docker-compose up --build
+# ============================================================
+
+x-kafka-common: &kafka-common
+  image: apache/kafka:latest
+  networks:
+    - fintech-network
+
+x-kafka-env-common: &kafka-env-common
+  KAFKA_PROCESS_ROLES: broker,controller
+  KAFKA_LISTENERS: PLAINTEXT://0.0.0.0:9092,CONTROLLER://0.0.0.0:9093
+  KAFKA_CONTROLLER_LISTENER_NAMES: CONTROLLER
+  KAFKA_LISTENER_SECURITY_PROTOCOL_MAP: PLAINTEXT:PLAINTEXT,CONTROLLER:PLAINTEXT
+  KAFKA_CONTROLLER_QUORUM_VOTERS: 1@kafka-broker-1:9093,2@kafka-broker-2:9093,3@kafka-broker-3:9093
+  KAFKA_OFFSETS_TOPIC_REPLICATION_FACTOR: 3
+  KAFKA_TRANSACTION_STATE_LOG_REPLICATION_FACTOR: 3
+  KAFKA_TRANSACTION_STATE_LOG_MIN_ISR: 2
+  KAFKA_DEFAULT_REPLICATION_FACTOR: 3
+  KAFKA_NUM_PARTITIONS: 3
+  KAFKA_MIN_INSYNC_REPLICAS: 2
+  CLUSTER_ID: fintech-kafka-cluster-01
+
+services:
+
+  # ── Kafka Cluster ─────────────────────────────────────────
+
+  kafka-broker-1:
+    <<: *kafka-common
+    container_name: kafka-broker-1
+    ports:
+      - "9092:9092"
+    environment:
+      <<: *kafka-env-common
+      KAFKA_NODE_ID: 1
+      KAFKA_ADVERTISED_LISTENERS: PLAINTEXT://kafka-broker-1:9092
+
+  kafka-broker-2:
+    <<: *kafka-common
+    container_name: kafka-broker-2
+    ports:
+      - "9094:9092"
+    environment:
+      <<: *kafka-env-common
+      KAFKA_NODE_ID: 2
+      KAFKA_ADVERTISED_LISTENERS: PLAINTEXT://kafka-broker-2:9092
+
+  kafka-broker-3:
+    <<: *kafka-common
+    container_name: kafka-broker-3
+    ports:
+      - "9095:9092"
+    environment:
+      <<: *kafka-env-common
+      KAFKA_NODE_ID: 3
+      KAFKA_ADVERTISED_LISTENERS: PLAINTEXT://kafka-broker-3:9092
+
+  # ── Databases ─────────────────────────────────────────────
+
+  profile-db:
+    image: postgres:17.2-alpine
+    container_name: profile-service-db
+    environment:
+      POSTGRES_DB: profile-service
+      POSTGRES_USER: profile-service
+      POSTGRES_PASSWORD: profile-service
+    ports:
+      - "5432:5432"
+    volumes:
+      - profile_data:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U profile-service -d profile-service"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+    networks:
+      - fintech-network
+
+  virtual-account-db:
+    image: postgres:17.2-alpine
+    container_name: virtual-account-service-db
+    environment:
+      POSTGRES_DB: virtual-account-service
+      POSTGRES_USER: virtual-account-service
+      POSTGRES_PASSWORD: virtual-account-service
+    ports:
+      - "5433:5432"
+    volumes:
+      - virtual_account_data:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U virtual-account-service -d virtual-account-service"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+    networks:
+      - fintech-network
+
+  charge-db:
+    image: postgres:17.2-alpine
+    container_name: charge-service-db
+    environment:
+      POSTGRES_DB: charge-service
+      POSTGRES_USER: charge-service
+      POSTGRES_PASSWORD: charge-service
+    ports:
+      - "5434:5432"
+    volumes:
+      - charge_data:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U charge-service -d charge-service"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+    networks:
+      - fintech-network
+
+  transfer-db:
+    image: postgres:17.2-alpine
+    container_name: transfer-service-db
+    environment:
+      POSTGRES_DB: transfer-service
+      POSTGRES_USER: transfer-service
+      POSTGRES_PASSWORD: transfer-service
+    ports:
+      - "5435:5432"
+    volumes:
+      - transfer_data:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U transfer-service -d transfer-service"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+    networks:
+      - fintech-network
+
+  ledger-db:
+    image: postgres:17.2-alpine
+    container_name: ledger-service-db
+    environment:
+      POSTGRES_DB: ledger-service
+      POSTGRES_USER: ledger-service
+      POSTGRES_PASSWORD: ledger-service
+    ports:
+      - "5436:5432"
+    volumes:
+      - ledger_data:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U ledger-service -d ledger-service"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+    networks:
+      - fintech-network
+
+  # ── Microservices ──────────────────────────────────────────
+
+  profile-service:
+    build:
+      context: ./profile-service
+      dockerfile: Dockerfile
+    container_name: profile-service-app
+    depends_on:
+      profile-db:
+        condition: service_healthy
+    environment:
+      SPRING_PROFILES_ACTIVE: dev
+      DB_HOST: profile-db
+      DB_PORT: 5432
+      DB_NAME: profile-service
+      DB_USERNAME: profile-service
+      DB_PASSWORD: profile-service
+    ports:
+      - "8080:8080"
+    networks:
+      - fintech-network
+
+  virtual-account-service:
+    build:
+      context: ./virtual-account-service
+      dockerfile: Dockerfile
+    container_name: virtual-account-service-app
+    depends_on:
+      virtual-account-db:
+        condition: service_healthy
+    environment:
+      SPRING_PROFILES_ACTIVE: dev
+      DB_HOST: virtual-account-db
+      DB_PORT: 5432
+      DB_NAME: virtual-account-service
+      DB_USERNAME: virtual-account-service
+      DB_PASSWORD: virtual-account-service
+    ports:
+      - "8081:8080"
+    networks:
+      - fintech-network
+
+  charge-service:
+    build:
+      context: ./charge-service
+      dockerfile: Dockerfile
+    container_name: charge-service-app
+    depends_on:
+      charge-db:
+        condition: service_healthy
+      kafka-broker-1:
+        condition: service_started
+    environment:
+      SPRING_PROFILES_ACTIVE: dev
+      DB_HOST: charge-db
+      DB_PORT: 5432
+      DB_NAME: charge-service
+      DB_USERNAME: charge-service
+      DB_PASSWORD: charge-service
+      SPRING_KAFKA_BOOTSTRAP_SERVERS: kafka-broker-1:9092,kafka-broker-2:9092,kafka-broker-3:9092
+    ports:
+      - "8082:8080"
+    networks:
+      - fintech-network
+
+  transfer-service:
+    build:
+      context: ./transfer-service
+      dockerfile: Dockerfile
+    container_name: transfer-service-app
+    depends_on:
+      transfer-db:
+        condition: service_healthy
+      kafka-broker-1:
+        condition: service_started
+    environment:
+      SPRING_PROFILES_ACTIVE: dev
+      DB_HOST: transfer-db
+      DB_PORT: 5432
+      DB_NAME: transfer-service
+      DB_USERNAME: transfer-service
+      DB_PASSWORD: transfer-service
+      SPRING_KAFKA_BOOTSTRAP_SERVERS: kafka-broker-1:9092,kafka-broker-2:9092,kafka-broker-3:9092
+    ports:
+      - "8083:8083"
+    networks:
+      - fintech-network
+
+  ledger-service:
+    build:
+      context: ./ledger-service
+      dockerfile: Dockerfile
+    container_name: ledger-service-app
+    depends_on:
+      ledger-db:
+        condition: service_healthy
+      kafka-broker-1:
+        condition: service_started
+      profile-service:
+        condition: service_started
+    environment:
+      SPRING_PROFILES_ACTIVE: dev
+      DB_HOST: ledger-db
+      DB_PORT: 5432
+      DB_NAME: ledger-service
+      DB_USERNAME: ledger-service
+      DB_PASSWORD: ledger-service
+      SPRING_KAFKA_BOOTSTRAP_SERVERS: kafka-broker-1:9092,kafka-broker-2:9092,kafka-broker-3:9092
+      SERVICES_PROFILE_SERVICE_BASE_URL: http://profile-service:8080
+    ports:
+      - "8085:8085"
+    networks:
+      - fintech-network
+
+  notification-service:
+    build:
+      context: ./notification-service
+      dockerfile: Dockerfile
+    container_name: notification-service-app
+    depends_on:
+      kafka-broker-1:
+        condition: service_started
+    environment:
+      SPRING_PROFILES_ACTIVE: dev
+      SPRING_KAFKA_BOOTSTRAP_SERVERS: kafka-broker-1:9092,kafka-broker-2:9092,kafka-broker-3:9092
+    ports:
+      - "8086:8086"
+    networks:
+      - fintech-network
+
+volumes:
+  profile_data:
+  virtual_account_data:
+  charge_data:
+  transfer_data:
+  ledger_data:
+
+networks:
+  fintech-network:
+    driver: bridge
