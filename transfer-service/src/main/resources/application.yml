@@ -1,0 +1,8 @@
+spring:
+  application:
+    name: transfer-service
+  profiles:
+    active: dev
+
+server:
+  port: 8083
