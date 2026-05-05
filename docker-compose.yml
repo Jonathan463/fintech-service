@@ -162,8 +162,8 @@ services:
 
   profile-service:
     build:
-      context: ./profile-service
-      dockerfile: Dockerfile
+      context: .
+      dockerfile: profile-service/Dockerfile
     container_name: profile-service-app
     depends_on:
       profile-db:
@@ -182,8 +182,8 @@ services:
 
   virtual-account-service:
     build:
-      context: ./virtual-account-service
-      dockerfile: Dockerfile
+      context: .
+      dockerfile: virtual-account-service/Dockerfile
     container_name: virtual-account-service-app
     depends_on:
       virtual-account-db:
@@ -202,8 +202,8 @@ services:
 
   charge-service:
     build:
-      context: ./charge-service
-      dockerfile: Dockerfile
+      context: .
+      dockerfile: charge-service/Dockerfile
     container_name: charge-service-app
     depends_on:
       charge-db:
@@ -225,8 +225,8 @@ services:
 
   transfer-service:
     build:
-      context: ./transfer-service
-      dockerfile: Dockerfile
+      context: .
+      dockerfile: transfer-service/Dockerfile
     container_name: transfer-service-app
     depends_on:
       transfer-db:
@@ -248,8 +248,8 @@ services:
 
   ledger-service:
     build:
-      context: ./ledger-service
-      dockerfile: Dockerfile
+      context: .
+      dockerfile: ledger-service/Dockerfile
     container_name: ledger-service-app
     depends_on:
       ledger-db:
@@ -274,8 +274,8 @@ services:
 
   notification-service:
     build:
-      context: ./notification-service
-      dockerfile: Dockerfile
+      context: .
+      dockerfile: notification-service/Dockerfile
     container_name: notification-service-app
     depends_on:
       kafka-broker-1:
@@ -287,6 +287,22 @@ services:
       - "8086:8086"
     networks:
       - fintech-network
+
+  kafka-ui:
+    image: provectuslabs/kafka-ui:latest
+    container_name: kafka-ui
+    ports:
+      - "8090:8080"
+    environment:
+      KAFKA_CLUSTERS_0_NAME: fintech-cluster
+      KAFKA_CLUSTERS_0_BOOTSTRAPSERVERS: kafka-broker-1:9092,kafka-broker-2:9092,kafka-broker-3:9092
+    depends_on:
+      - kafka-broker-1
+      - kafka-broker-2
+      - kafka-broker-3
+    networks:
+      - fintech-network
+
 
 volumes:
   profile_data:

@@ -49,12 +49,20 @@ public class TransferServiceImpl implements TransferService {
         transfer.setUpdatedAt(LocalDateTime.now());
         Transfer saved = transferRepository.save(transfer);
 
-        TransferInitiatedEvent event = new TransferInitiatedEvent(
-                saved.getId(), saved.getReferenceNumber(), saved.getVirtualAccountNumber(),
-                saved.getBusinessId(), saved.getSourceAccountNumber(), saved.getSourceBankName(),
-                saved.getTransferAmount(), saved.getCreatedAt());
-        transferEventProducer.publishTransferInitiated(event);
 
+            TransferInitiatedEvent event = new TransferInitiatedEvent(
+                    saved.getId(), saved.getReferenceNumber(), saved.getVirtualAccountNumber(),
+                    saved.getBusinessId(), saved.getSourceAccountNumber(), saved.getSourceBankName(),
+                    saved.getTransferAmount(), saved.getCreatedAt());
+            try{
+            transferEventProducer.publishTransferInitiated(event);
+        }
+        catch(Exception e){
+            log.error("Failed to publish transfer initiated event: {}", event, e);
+            throw e;
+        }
+
+            log.info("Saved transfer: id={}, status={} ",saved.getId(), saved.getStatus().name());
         return toResponse(saved);
     }
 
