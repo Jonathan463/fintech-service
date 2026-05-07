@@ -6,6 +6,7 @@ import org.springframework.stereotype.Service;
 import technologyforall.com.transferservice.dto.TransferRequest;
 import technologyforall.com.transferservice.dto.TransferResponse;
 import technologyforall.com.transferservice.event.TransferInitiatedEvent;
+import technologyforall.com.transferservice.exception.DuplicateTransferException;
 import technologyforall.com.transferservice.exception.InvalidTransferException;
 import technologyforall.com.transferservice.kafka.TransferEventProducer;
 import technologyforall.com.transferservice.model.Transfer;
@@ -47,6 +48,11 @@ public class TransferServiceImpl implements TransferService {
         transfer.setStatus(TransferStatus.PENDING);
         transfer.setCreatedAt(LocalDateTime.now());
         transfer.setUpdatedAt(LocalDateTime.now());
+
+        if(transferRepository.findByReferenceNumber(reference).isPresent()){
+            throw new DuplicateTransferException("A transfer with number " + reference + "already exist");
+        }
+
         Transfer saved = transferRepository.save(transfer);
 
 
