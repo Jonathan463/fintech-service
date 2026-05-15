@@ -1,12 +1,10 @@
 FROM maven:3.9-eclipse-temurin-21-alpine AS build
 WORKDIR /app
 
-# Install common-lib first
 COPY common-lib ./common-lib
 WORKDIR /app/common-lib
 RUN mvn clean install -DskipTests
 
-# Build ledger-service
 WORKDIR /app/service
 COPY ledger-service/pom.xml .
 COPY ledger-service/src ./src

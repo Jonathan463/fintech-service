@@ -5,10 +5,6 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 
-/**
- * Local mirror of profile-service PartnerResponse.
- * Used by ProfileServiceClient when fetching partner splits.
- */
 @Getter
 @Setter
 @AllArgsConstructor
