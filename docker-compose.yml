@@ -22,7 +22,7 @@ x-kafka-env-common: &kafka-env-common
 
 services:
 
-  # ── Kafka Cluster ─────────────────────────────────────────
+
 
   kafka-broker-1:
     <<: *kafka-common
@@ -54,7 +54,6 @@ services:
       KAFKA_NODE_ID: 3
       KAFKA_ADVERTISED_LISTENERS: PLAINTEXT://kafka-broker-3:9092
 
-  # ── Databases ─────────────────────────────────────────────
 
   profile-db:
     image: postgres:17.2-alpine
@@ -151,7 +150,6 @@ services:
     networks:
       - fintech-network
 
-  # ── Microservices ──────────────────────────────────────────
 
   profile-service:
     build:
