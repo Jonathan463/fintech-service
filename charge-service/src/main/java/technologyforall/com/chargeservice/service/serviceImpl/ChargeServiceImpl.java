@@ -1,4 +1,4 @@
-package technologyforall.com.chargeservice.service;
+package technologyforall.com.chargeservice.service.serviceImpl;
 
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
@@ -8,12 +8,13 @@ import technologyforall.com.chargeservice.exception.InvalidAmountException;
 import technologyforall.com.chargeservice.model.Charge;
 import technologyforall.com.chargeservice.model.ChargeTier;
 import technologyforall.com.chargeservice.repository.ChargeRepository;
+import technologyforall.com.chargeservice.service.ChargeService;
 
 import java.math.BigDecimal;
 
 @Service
 @RequiredArgsConstructor
-public class ChargeServiceImpl implements ChargeService{
+public class ChargeServiceImpl implements ChargeService {
 
     private final ChargeRepository chargeRepository;
 

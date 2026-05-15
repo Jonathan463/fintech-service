@@ -5,5 +5,5 @@ import technologyforall.com.chargeservice.dto.ChargeResponse;
 
 
 public interface ChargeService {
-    public ChargeResponse calculateAndSaveCharge(ChargeRequest request);
+    ChargeResponse calculateAndSaveCharge(ChargeRequest request);
 }

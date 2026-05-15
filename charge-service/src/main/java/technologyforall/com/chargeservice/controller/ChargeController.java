@@ -7,7 +7,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import technologyforall.com.chargeservice.dto.ChargeRequest;
 import technologyforall.com.chargeservice.dto.ChargeResponse;
-import technologyforall.com.chargeservice.service.ChargeServiceImpl;
+import technologyforall.com.chargeservice.service.serviceImpl.ChargeServiceImpl;
 
 @RestController
 @RequestMapping("/api/charges")
