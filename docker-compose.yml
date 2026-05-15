@@ -1,12 +1,5 @@
 version: '3.8'
 
-# ============================================================
-#  Fintech Service — Full System docker-compose
-#  Starts: 3 Kafka brokers (KRaft) + 5 PostgreSQL databases
-#          + 6 Spring Boot microservices on one shared network.
-#
-#  Usage:  docker-compose up --build
-# ============================================================
 
 x-kafka-common: &kafka-common
   image: apache/kafka:latest
