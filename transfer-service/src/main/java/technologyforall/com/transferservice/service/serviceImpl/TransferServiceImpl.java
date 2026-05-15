@@ -1,4 +1,4 @@
-package technologyforall.com.transferservice.service;
+package technologyforall.com.transferservice.service.serviceImpl;
 
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -12,6 +12,7 @@ import technologyforall.com.transferservice.kafka.TransferEventProducer;
 import technologyforall.com.transferservice.model.Transfer;
 import technologyforall.com.transferservice.model.TransferStatus;
 import technologyforall.com.transferservice.repository.TransferRepository;
+import technologyforall.com.transferservice.service.TransferService;
 
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
