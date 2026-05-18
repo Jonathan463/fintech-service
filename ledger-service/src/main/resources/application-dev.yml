@@ -41,6 +41,24 @@ spring:
       properties:
         spring.json.trusted.packages: "*"
 
+  security:
+    oauth2:
+      resourceserver:
+        jwt:
+          issuer-uri: http://keycloak:8080/realms/fintech
+          jwk-set-uri: http://keycloak:8080/realms/fintech/protocol/openid-connect/certs
+      client:
+        registration:
+          keycloak:
+            client-id: ledger-service
+            client-secret: ${LEDGER_SERVICE_CLIENT_SECRET}
+            authorization-grant-type: client_credentials
+            scope: openid
+        provider:
+          keycloak:
+            token-uri: http://keycloak:8080/realms/fintech/protocol/openid-connect/token
+
+
 services:
   profile-service:
     base-url: http://localhost:8081

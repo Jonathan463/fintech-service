@@ -6,6 +6,9 @@ COPY common-lib ./common-lib
 WORKDIR /app/common-lib
 RUN mvn clean install -DskipTests
 
+COPY security-lib ./security-lib
+WORKDIR /app/security-lib
+RUN mvn clean install -DskipTests
 
 WORKDIR /app/service
 COPY transfer-service/pom.xml .
