@@ -45,7 +45,6 @@ spring:
     oauth2:
       resourceserver:
         jwt:
-          issuer-uri: http://keycloak:8080/realms/fintech
           jwk-set-uri: http://keycloak:8080/realms/fintech/protocol/openid-connect/certs
       client:
         registration:

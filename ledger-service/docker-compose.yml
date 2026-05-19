@@ -37,6 +37,7 @@ services:
       DB_PASSWORD: ${DB_PASSWORD:-ledger-service}
       SPRING_KAFKA_BOOTSTRAP_SERVERS: ${KAFKA_BOOTSTRAP_SERVERS:-kafka-broker-1:9092,kafka-broker-2:9092,kafka-broker-3:9092}
       SERVICES_PROFILE_SERVICE_BASE_URL: ${PROFILE_SERVICE_URL:-http://localhost:8080}
+      LEDGER_SERVICE_CLIENT_SECRET: ${CLIENT_SECRET:-SDp5z1hyxlQIHgBKtCunya3xz35slWSz}
     ports:
       - "8085:8085"
     networks:

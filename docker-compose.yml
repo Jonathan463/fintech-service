@@ -150,6 +150,24 @@ services:
     networks:
       - fintech-network
 
+  keycloak-db:
+    image: postgres:17.2-alpine
+    container_name: keycloak-db
+    environment:
+      POSTGRES_DB: keycloak
+      POSTGRES_USER: keycloak
+      POSTGRES_PASSWORD: keycloak
+    ports:
+      - "5437:5432"
+    volumes:
+      - keycloak_data:/var/lib/postgresql/data
+    healthcheck:
+      test: [ "CMD-SHELL", "pg_isready -U keycloak -d keycloak" ]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+    networks:
+      - fintech-network
 
   profile-service:
     build:
@@ -159,6 +177,8 @@ services:
     depends_on:
       profile-db:
         condition: service_healthy
+      keycloak:
+        condition: service_started
     environment:
       SPRING_PROFILES_ACTIVE: dev
       DB_HOST: profile-db
@@ -179,6 +199,8 @@ services:
     depends_on:
       virtual-account-db:
         condition: service_healthy
+      keycloak:
+        condition: service_started
     environment:
       SPRING_PROFILES_ACTIVE: dev
       DB_HOST: virtual-account-db
@@ -199,6 +221,8 @@ services:
     depends_on:
       charge-db:
         condition: service_healthy
+      keycloak:
+        condition: service_started
       kafka-broker-1:
         condition: service_started
     environment:
@@ -222,6 +246,8 @@ services:
     depends_on:
       transfer-db:
         condition: service_healthy
+      keycloak:
+        condition: service_started
       kafka-broker-1:
         condition: service_started
     environment:
@@ -245,6 +271,8 @@ services:
     depends_on:
       ledger-db:
         condition: service_healthy
+      keycloak:
+        condition: service_started
       kafka-broker-1:
         condition: service_started
       profile-service:
@@ -258,6 +286,7 @@ services:
       DB_PASSWORD: ledger-service
       SPRING_KAFKA_BOOTSTRAP_SERVERS: kafka-broker-1:9092,kafka-broker-2:9092,kafka-broker-3:9092
       SERVICES_PROFILE_SERVICE_BASE_URL: http://profile-service:8080
+      LEDGER_SERVICE_CLIENT_SECRET: SDp5z1hyxlQIHgBKtCunya3xz35slWSz
     ports:
       - "8085:8085"
     networks:
@@ -271,11 +300,32 @@ services:
     depends_on:
       kafka-broker-1:
         condition: service_started
+      keycloak:
+        condition: service_started
     environment:
       SPRING_PROFILES_ACTIVE: dev
       SPRING_KAFKA_BOOTSTRAP_SERVERS: kafka-broker-1:9092,kafka-broker-2:9092,kafka-broker-3:9092
     ports:
       - "8086:8086"
+    networks:
+      - fintech-network
+
+  keycloak:
+    image: quay.io/keycloak/keycloak:24.0
+    container_name: keycloak
+    command: start-dev
+    environment:
+      KEYCLOAK_ADMIN: admin
+      KEYCLOAK_ADMIN_PASSWORD: admin
+      KC_DB: postgres
+      KC_DB_URL: jdbc:postgresql://keycloak-db:5432/keycloak
+      KC_DB_USERNAME: keycloak
+      KC_DB_PASSWORD: keycloak
+    ports:
+      - "8180:8080"
+    depends_on:
+      keycloak-db:
+        condition: service_healthy
     networks:
       - fintech-network
 
@@ -301,6 +351,7 @@ volumes:
   charge_data:
   transfer_data:
   ledger_data:
+  keycloak_data:
 
 networks:
   fintech-network:
