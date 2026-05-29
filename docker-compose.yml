@@ -178,7 +178,7 @@ services:
       profile-db:
         condition: service_healthy
       keycloak:
-        condition: service_started
+        condition: service_healthy
     environment:
       SPRING_PROFILES_ACTIVE: dev
       DB_HOST: profile-db
@@ -200,7 +200,7 @@ services:
       virtual-account-db:
         condition: service_healthy
       keycloak:
-        condition: service_started
+        condition: service_healthy
     environment:
       SPRING_PROFILES_ACTIVE: dev
       DB_HOST: virtual-account-db
@@ -222,7 +222,7 @@ services:
       charge-db:
         condition: service_healthy
       keycloak:
-        condition: service_started
+        condition: service_healthy
       kafka-broker-1:
         condition: service_started
     environment:
@@ -247,7 +247,7 @@ services:
       transfer-db:
         condition: service_healthy
       keycloak:
-        condition: service_started
+        condition: service_healthy
       kafka-broker-1:
         condition: service_started
     environment:
@@ -272,7 +272,7 @@ services:
       ledger-db:
         condition: service_healthy
       keycloak:
-        condition: service_started
+        condition: service_healthy
       kafka-broker-1:
         condition: service_started
       profile-service:
@@ -301,7 +301,7 @@ services:
       kafka-broker-1:
         condition: service_started
       keycloak:
-        condition: service_started
+        condition: service_healthy
     environment:
       SPRING_PROFILES_ACTIVE: dev
       SPRING_KAFKA_BOOTSTRAP_SERVERS: kafka-broker-1:9092,kafka-broker-2:9092,kafka-broker-3:9092
@@ -321,11 +321,22 @@ services:
       KC_DB_URL: jdbc:postgresql://keycloak-db:5432/keycloak
       KC_DB_USERNAME: keycloak
       KC_DB_PASSWORD: keycloak
+      KC_HOSTNAME: keycloak
+      KC_HOSTNAME_PORT: 8080
+      KC_HOSTNAME_STRICT: false
+      KC_HOSTNAME_STRICT_HTTPS: false
+      KC_HEALTH_ENABLED: true
     ports:
       - "8180:8080"
     depends_on:
       keycloak-db:
         condition: service_healthy
+    healthcheck:
+      test: [ "CMD-SHELL", "exec 3<>/dev/tcp/localhost/8080 || exit 1" ]
+      interval: 15s
+      timeout: 5s
+      retries: 10
+      start_period: 60s
     networks:
       - fintech-network
 
