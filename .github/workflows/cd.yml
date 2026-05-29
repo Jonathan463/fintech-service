@@ -1,0 +1,74 @@
+name: CD - Deploy to AWS
+
+on:
+  push:
+    branches: [ master ]
+
+env:
+  AWS_REGION: ${{ secrets.AWS_REGION }}
+  ECR_REGISTRY: ${{ secrets.AWS_ACCOUNT_ID }}.dkr.ecr.${{ secrets.AWS_REGION }}.amazonaws.com
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Set up Java 21
+        uses: actions/setup-java@v4
+        with:
+          java-version: '21'
+          distribution: 'temurin'
+          cache: maven
+
+      - name: Build shared libraries
+        run: |
+          mvn -f common-lib/pom.xml clean install -DskipTests
+          mvn -f security-lib/pom.xml clean install -DskipTests
+
+      - name: Configure AWS credentials
+        uses: aws-actions/configure-aws-credentials@v4
+        with:
+          aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
+          aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+          aws-region: ${{ env.AWS_REGION }}
+
+      - name: Login to Amazon ECR
+        uses: aws-actions/amazon-ecr-login@v2
+
+      - name: Build and push Docker images to ECR
+        run: |
+          IMAGE_TAG=${{ github.sha }}
+          for service in profile-service virtual-account-service charge-service \
+                         transfer-service ledger-service notification-service; do
+            echo "Building and pushing $service..."
+            docker build -f $service/Dockerfile \
+              -t $ECR_REGISTRY/$service:$IMAGE_TAG \
+              -t $ECR_REGISTRY/$service:latest .
+            docker push $ECR_REGISTRY/$service:$IMAGE_TAG
+            docker push $ECR_REGISTRY/$service:latest
+          done
+
+      - name: Deploy to EC2 via SSH
+        uses: appleboy/ssh-action@v1
+        with:
+          host: ${{ secrets.EC2_HOST }}
+          username: ec2-user
+          key: ${{ secrets.EC2_SSH_KEY }}
+          script: |
+            aws ecr get-login-password --region ${{ secrets.AWS_REGION }} | \
+              docker login --username AWS --password-stdin \
+              ${{ secrets.AWS_ACCOUNT_ID }}.dkr.ecr.${{ secrets.AWS_REGION }}.amazonaws.com
+
+            cd ~/fintech-microservices/fintech-service
+
+            git pull origin master
+
+            export ECR_REGISTRY=${{ secrets.AWS_ACCOUNT_ID }}.dkr.ecr.${{ secrets.AWS_REGION }}.amazonaws.com
+
+            docker-compose pull
+            docker-compose up -d
+
+            docker image prune -f
