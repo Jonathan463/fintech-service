@@ -170,9 +170,7 @@ services:
       - fintech-network
 
   profile-service:
-    build:
-      context: .
-      dockerfile: profile-service/Dockerfile
+    image: ${ECR_REGISTRY}/profile-service:latest
     container_name: profile-service-app
     depends_on:
       profile-db:
@@ -192,9 +190,7 @@ services:
       - fintech-network
 
   virtual-account-service:
-    build:
-      context: .
-      dockerfile: virtual-account-service/Dockerfile
+    image: ${ECR_REGISTRY}/virtual-account-service:latest
     container_name: virtual-account-service-app
     depends_on:
       virtual-account-db:
@@ -214,9 +210,7 @@ services:
       - fintech-network
 
   charge-service:
-    build:
-      context: .
-      dockerfile: charge-service/Dockerfile
+    image: ${ECR_REGISTRY}/charge-service:latest
     container_name: charge-service-app
     depends_on:
       charge-db:
@@ -239,9 +233,7 @@ services:
       - fintech-network
 
   transfer-service:
-    build:
-      context: .
-      dockerfile: transfer-service/Dockerfile
+    image: ${ECR_REGISTRY}/transfer-service:latest
     container_name: transfer-service-app
     depends_on:
       transfer-db:
@@ -264,9 +256,7 @@ services:
       - fintech-network
 
   ledger-service:
-    build:
-      context: .
-      dockerfile: ledger-service/Dockerfile
+    image: ${ECR_REGISTRY}/ledger-service:latest
     container_name: ledger-service-app
     depends_on:
       ledger-db:
@@ -293,9 +283,7 @@ services:
       - fintech-network
 
   notification-service:
-    build:
-      context: .
-      dockerfile: notification-service/Dockerfile
+    image: ${ECR_REGISTRY}/notification-service:latest
     container_name: notification-service-app
     depends_on:
       kafka-broker-1:
