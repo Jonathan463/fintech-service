@@ -67,8 +67,35 @@ jobs:
             git pull origin master
 
             export ECR_REGISTRY=${{ secrets.AWS_ACCOUNT_ID }}.dkr.ecr.${{ secrets.AWS_REGION }}.amazonaws.com
-
+            
             docker-compose pull
-            docker-compose up -d
 
+            docker-compose up -d keycloak-db profile-service-db virtual-account-service-db transfer-service-db ledger-service-db charge-service-db kafka-broker-1 kafka-broker-2 kafka-broker-3
+
+            sleep 30
+
+            docker-compose up -d keycloak kafka-ui
+
+            sleep 40
+
+            docker-compose up -d profile-service
+            sleep 15
+          
+            docker-compose up -d virtual-account-service
+            sleep 15
+          
+            docker-compose up -d charge-service
+            sleep 15
+          
+            docker-compose up -d ledger-service
+            sleep 15
+          
+            docker-compose up -d transfer-service
+            sleep 15
+          
+            docker-compose up -d notification-service
+          
+            docker-compose ps
+            docker ps
+          
             docker image prune -f
