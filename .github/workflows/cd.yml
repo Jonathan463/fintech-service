@@ -57,6 +57,8 @@ jobs:
           host: ${{ secrets.EC2_HOST }}
           username: ec2-user
           key: ${{ secrets.EC2_SSH_KEY }}
+          timeout: 20m
+          command_timeout: 20m
           script: |
             aws ecr get-login-password --region ${{ secrets.AWS_REGION }} | \
               docker login --username AWS --password-stdin \
@@ -66,11 +68,11 @@ jobs:
 
             git pull origin master
 
-            export ECR_REGISTRY=${{ secrets.AWS_ACCOUNT_ID }}.dkr.ecr.${{ secrets.AWS_REGION }}.amazonaws.com
-            
+                        export ECR_REGISTRY=${{ secrets.AWS_ACCOUNT_ID }}.dkr.ecr.${{ secrets.AWS_REGION }}.amazonaws.com
+
             docker-compose pull
 
-            docker-compose up -d keycloak-db profile-service-db virtual-account-service-db transfer-service-db ledger-service-db charge-service-db kafka-broker-1 kafka-broker-2 kafka-broker-3
+            docker-compose up -d keycloak-db profile-db virtual-account-db transfer-db ledger-db charge-db kafka-broker-1 kafka-broker-2 kafka-broker-3
 
             sleep 30
 
@@ -80,22 +82,16 @@ jobs:
 
             docker-compose up -d profile-service
             sleep 15
-          
             docker-compose up -d virtual-account-service
             sleep 15
-          
             docker-compose up -d charge-service
             sleep 15
-          
             docker-compose up -d ledger-service
             sleep 15
-          
             docker-compose up -d transfer-service
             sleep 15
-          
             docker-compose up -d notification-service
-          
+
             docker-compose ps
             docker ps
-          
             docker image prune -f
